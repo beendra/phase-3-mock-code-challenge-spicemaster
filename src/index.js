@@ -1,4 +1,7 @@
 const url = 'http://localhost:3000/spiceblends'
+const ingredientsUrl = 'http://localhost:3000/ingredients'
+const spiceImagesDiv = document.querySelector('div#spice-images')
+
 
 //deliverable 1
 
@@ -32,6 +35,26 @@ fetch(`${url}/1`)
             ingredientsUl.append(li) 
         }) 
         console.log(data.ingredients)
+    })
+
+    //advanced deliverable 2
+fetch(url)
+    .then(resp => resp.json())
+    // .then(data => {
+    //     console.log(data) //each object represents one spiceblend, rename to something that makes sense 
+    // })
+    .then(spiceBlendArray => {
+        spiceBlendArray.forEach(spiceObject => {
+            const img = document.createElement('img') //create the image element
+            img.src = spiceObject.image //update src
+            img.alt = spiceObject.title //update alt 
+            img.dataset.id = spiceObject.id //for event listener to click on the image on the top of the page
+            //find on the page where we want to append these images to the div with spice images, all of the elements being created should be children of this div
+            // const spiceImagesDiv = document.querySelector('div#spice-images') made a global variable 
+            //append each image to this div
+            spiceImagesDiv.append(img)
+            //can add a data id attribute 
+        })
     })
 
  //deliverable 2
@@ -88,4 +111,42 @@ newIngredientForm.addEventListener('submit', event => {
     ingredientsUl.append(li)
 
     event.target.reset()
+    //for advanced deliverable we need to persist to make a fetch request
+    //make a request to ingredients url
+    fetch(ingredientsUrl, {
+        method: "POST",
+        headers: {
+            "Type-Content": "application/json"
+        },
+        body: JSON.stringify({
+            //need to pass in name property with the ingredient name, spiceblend id
+            name: newIngredientInput,
+            spiceblendId: 1
+        })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        console.log(data) //check out the data you get 
+    })
+}) //this event listener is optimistic rendering to display data to the user before making our fetch
+
+
+spiceImagesDiv.addEventListener('click', event => {
+    // console.log(event.target) // will always tell you which element fired off the invocation of this callback funtion 
+    //write a conditional 
+    if(event.target.matches('img')) {
+        console.log(event.target)//test if the click on the image works
+        //from inside of this if statement make a variable
+        const id = event.target.dataset.id //allows us to access any elements that start with data - and id lets us get any elements that start with data-id
+        console.log(id)
+        //then make a fetch request to get the data for those 
+        fetch(`${url}/${id}`)
+        .then(resp => resp.json())
+        // .then(data => {
+        //     console.log(data) // get data to see what you get and then can make it meaningful 
+        // })
+        .then(spiceBlendObject => {
+            console.log(spiceBlendObject)
+        })
+    }
 })
