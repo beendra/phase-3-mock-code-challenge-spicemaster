@@ -73,6 +73,8 @@ const addIngredient = (event) => {
 
 }
 
+/*** EVENT LISTENERS ***/
+
 body.addEventListener('submit', event => {
     if (event.target.matches('#update-form')){
         updateSpice(event)
