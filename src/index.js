@@ -99,10 +99,12 @@
 
 const url = 'http://localhost:3000/spiceblends'
 
+//deliverable 1
+
 fetch(`${url}/1`)
     .then(resp => resp.json())
     .then(data => {
-        console.log(data) //what data do you get back when console.log
+        // console.log(data) //what data do you get back when console.log
         //first find the title 
         const detailH2 = document.querySelector('h2.title')
         detailH2.textContent = data.title
@@ -124,9 +126,65 @@ fetch(`${url}/1`)
 
             const li = document.createElement('li')
             li.textContent = ingredientObject.name
-            console.log(li) //so far only in the browsers memory
+            // console.log(li) //so far only in the browsers memory
             //query select the ul so the lis can be appended to it (x)
             ingredientsUl.append(li) 
         }) 
         console.log(data.ingredients)
     })
+
+ //deliverable 2
+
+    const updateForm = document.querySelector('form#update-form')
+    //find form that needs to be updated, global variable
+    updateForm.addEventListener('submit', event => {
+        //create event listener for submit
+        //pass in call back function 
+        event.preventDefault() //prevent refresh on the form.
+        // console.log('form submitted') //check if event listener works
+
+        //get user input
+        const titleInput = event.target.title.value //this gives the input field and .value gives what the user puts in
+        //has a name and id attribute that give a title and spice blend title that can be called on event.target
+        //if you dont see a name attribute in a form you can add it to the html
+        // console.log(event.target.title) //input field element
+        //title input needs to persist so a patch request needs to be made so the new title can be saved in the db
+        fetch(`${url}/1`, {
+            method: "PATCH",
+            headers: {
+                "Type-Content": "application/json"
+            },
+            body: JSON.stringify({ title: titleInput })//pass in the property of an object we're tryihng to update
+        })
+        .then(resp => resp.json())//goes into the response object and pulls out thd data for us to work with
+        // .then(data => {
+        //     console.log(data)//get data back from the server and can console.log to double check and  see whats available to manipulate then can rename the parameter for data to something more meaningful
+        // })
+        .then(updatedSpiceBlendObj =>{
+            const detailH2 = document.querySelector('h2.title')
+            detailH2.textContent = updatedSpiceBlendObj.title
+        })
+        //then manipulate the dom, on the user side they should see the new title displayed so to change the text content first find the element thats holding the text, inspect it's the h2, so find the h2 and update the text content to show the new title that the user input
+    })
+
+//deliverable 3 
+//search for form on the dom using queryselector
+const newIngredientForm = document.querySelector('form#ingredient-form')
+//global variable
+
+newIngredientForm.addEventListener('submit', event => {
+    //submit event
+    event.preventDefault()
+    // console.log('submitted!') //test if form is submitted by adding an ingredient
+    //next get user input
+    const newIngredientInput = event.target['ingredient-name'].value
+    // console.log(newIngredientInput)
+    //need to add this ingredient to the ingredient section, theyre all in the ul inside of an li so a new ingredient should have an li, create one
+    const li = document.createElement('li')
+    li.textContent = newIngredientInput 
+
+    const ingredientsUl = document.querySelector('ul.ingredients-list') //(x)
+    ingredientsUl.append(li)
+
+    event.target.reset()
+})
